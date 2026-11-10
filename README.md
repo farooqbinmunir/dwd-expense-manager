@@ -65,7 +65,8 @@ hidden in the UI. Other protections:
 
 ```
 supabase/migrations/   SQL: schema, constraints, indexes, RLS, storage policies, report functions,
-                       import RPC (…_schema.sql) and initial categories (…_seed_categories.sql)
+                       import RPC (…_schema.sql), initial categories (…_seed_categories.sql) and
+                       Data API privileges (…_grants.sql)
 scripts/import-sheet.ts   historical import + reconciliation (idempotent)
 scripts/create-admin.ts   bootstrap the first admin
 src/proxy.ts           session refresh + redirect to /login (Next 16 "proxy" = middleware)
@@ -74,7 +75,8 @@ src/lib/import/        ledger parser, merged-cell handling, xlsx image extractio
 src/app/(app)/         dashboard, transactions, people, categories, reports, admin/users, account
 src/app/api/export/    CSV export
 tests/                 unit tests (vitest) + tests/integration (RLS, against local Supabase)
-docs/import-report.md  reconciliation report of the historical import
+docs/import-report.md  reconciliation report of the historical import (local run)
+docs/import-report-production.md   the same, for the live Supabase project
 docs/csv-import-template.csv   template for the CSV fallback import
 ```
 
@@ -95,17 +97,18 @@ Copy `.env.example` to `.env.local` and fill in the values. Set the same names i
 
 ## 1. Set up Supabase (production)
 
-1. Create a project at <https://supabase.com/dashboard>. A region near Pakistan, such as
-   *South Asia (Mumbai)*, works well. Save the database password.
+1. Create a project at <https://supabase.com/dashboard> and save the database password. (The live
+   project, `dwd-expense-manager`, is in *Sydney*; a region near the users is best.)
 2. **Apply the migrations.** Run these in PowerShell from the project folder:
    ```powershell
    npx supabase login
    npx supabase link --project-ref YOUR-PROJECT-REF
    npx supabase db push
    ```
-   If you prefer not to use the CLI, open **SQL Editor** and run the two files in
-   `supabase/migrations/` in order.
-3. Set up **Authentication**:
+   If you prefer not to use the CLI, open **SQL Editor** and run the three files in
+   `supabase/migrations/` in order (schema, seed categories, grants).
+3. Set up **Authentication**. `npx supabase config push` applies these from
+   `supabase/config.toml`; or set them in the dashboard:
    - **Authentication → Sign In / Providers → Email**: keep *Email* enabled.
    - **Authentication → Sign In / Providers**: turn **"Allow new users to sign up" OFF**. Only admins
      create accounts.
