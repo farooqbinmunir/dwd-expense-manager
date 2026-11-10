@@ -43,3 +43,6 @@ next-env.d.ts
 
 # import artefacts (snapshots contain receipt images)
 /import-reports/
+
+.vercel
+.env*
